@@ -73,25 +73,7 @@ Password: admin
 - Toggle it ON
 - It will run automatically every 10 minutes
 
----
 
-## 📁 Project Structure
-```
-airflow-transaction-pipeline/
-├── dags/
-│   └── Transaction_Pipeline.py   # Main DAG definition
-├── data/
-│   ├── process_transactions.py   # External script (BashOperator)
-│   └── transactions_report.txt  # Generated report output
-├── screenshots/
-│   ├── airflow_ui.jpg
-│   ├── docker_ui.jpg
-│   ├── email.jpg
-│   ├── Grantt.jpg
-│   └── Graph.jpg
-├── airflow.yaml           # Docker services configuration
-└── README.md
-```
 
 ---
 
@@ -114,18 +96,28 @@ airflow-transaction-pipeline/
 
 ---
 
-## 📧 Email Report Sample
-```
-Daily Transaction Report
-Number of transactions: 4
-Total amount: 1070
-Processed at 2026-04-07 12:53:28.108667
-```
-
----
-
 ## ⚠️ Notes
 - Make sure port **587** is accessible on your network (SMTP).
   ISP-level blocking is common — mobile data is a reliable workaround.
 - Gmail requires an **App Password** (not your regular password).
   Generate one at: myaccount.google.com/apppasswords
+---
+
+## 📁 Project Structure
+```
+airflow-transaction-pipeline/
+├── dags/
+│   └── Transaction_Pipeline.py   # Main DAG definition
+├── data/
+│   ├── process_transactions.py   # External script (BashOperator)
+│   └── transactions_report.txt  # Generated report output
+├── screenshots/
+│   ├── airflow_ui.jpg
+│   ├── docker_ui.jpg
+│   ├── email.jpg
+│   ├── Grantt.jpg
+│   └── Graph.jpg
+├── airflow.yaml           # Docker services configuration
+└── README.md
+```
+
