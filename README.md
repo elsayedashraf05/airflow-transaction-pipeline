@@ -49,7 +49,7 @@ git clone https://github.com/your-username/airflow-transaction-pipeline.git
 cd airflow-transaction-pipeline
 ```
 
-**2. Configure environment variables in `docker-compose.yaml`**
+**2. Configure environment variables in `airflow.yaml`**
 ```yaml
 - AIRFLOW__SMTP__SMTP_USER=your_email@gmail.com
 - AIRFLOW__SMTP__SMTP_PASSWORD=your_app_password
@@ -58,7 +58,7 @@ cd airflow-transaction-pipeline
 
 **3. Start the containers**
 ```bash
-docker-compose up -d
+airflow.yaml up -d
 ```
 
 **4. Access Airflow UI**
@@ -89,7 +89,7 @@ airflow-transaction-pipeline/
 │   ├── email.jpg
 │   ├── Grantt.jpg
 │   └── Graph.jpg
-├── docker-compose.yaml           # Docker services configuration
+├── airflow.yaml           # Docker services configuration
 └── README.md
 ```
 
