@@ -1,0 +1,146 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    networks:
+      - airflow-network
+
+  postgres_general:
+    image: postgres:15
+    container_name: postgres_general
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: sessiondb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_general_data:/var/lib/postgresql/data
+    networks:
+      - airflow-network
+
+  pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8085:80"
+    depends_on:
+      - postgres_general
+    networks:
+      - airflow-network
+
+  airflow-webserver:
+    image: apache/airflow:2.7.1-python3.9
+    container_name: airflow-webserver
+    restart: always
+    ports:
+      - "8089:8080"
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__WEBSERVER__BASE_URL=http://localhost:8089
+      - AIRFLOW__CORE__FERNET_KEY=3DjyQsK6JdTq4zsiK4XHzVmVEMtRzF7jwq9VDuHQx3M=
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__WEBSERVER__SECRET_KEY=mysecretkey
+      - AIRFLOW__LOGGING__BASE_LOG_FOLDER=/opt/airflow/logs
+      - KAGGLE_USERNAME=muhammedhamed
+      - KAGGLE_KEY=40c67eac40da8f3d2c4795f30deffcc2
+      - AIRFLOW__CORE__DEFAULT_TIMEZONE=Africa/Cairo
+      - TZ=Africa/Cairo
+      - AIRFLOW__SMTP__SMTP_HOST=smtp.gmail.com
+      - AIRFLOW__SMTP__SMTP_STARTTLS=True
+      - AIRFLOW__SMTP__SMTP_SSL=False
+      - AIRFLOW__SMTP__SMTP_PORT=587
+      - AIRFLOW__SMTP__SMTP_MAIL_FROM=put your email here
+      - AIRFLOW__SMTP__SMTP_USER=put your email here
+      - AIRFLOW__SMTP__SMTP_PASSWORD=put your app password here
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/data
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    user: "50000:0"
+    command: >
+      bash -c "
+        if [ -f /opt/airflow/requirements.txt ]; then
+          pip install --user -r /opt/airflow/requirements.txt;
+        fi &&
+        airflow db init &&
+        airflow users create --username admin --firstname Air --lastname Flow --role Admin --email admin@example.com --password admin || true &&
+        exec airflow webserver
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - airflow-network
+
+  airflow-scheduler:
+    image: apache/airflow:2.7.1-python3.9
+    container_name: airflow-scheduler
+    restart: always
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__WEBSERVER__BASE_URL=http://localhost:8089
+      - AIRFLOW__CORE__FERNET_KEY=3DjyQsK6JdTq4zsiK4XHzVmVEMtRzF7jwq9VDuHQx3M=
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+      - AIRFLOW__WEBSERVER__SECRET_KEY=mysecretkey
+      - AIRFLOW__LOGGING__BASE_LOG_FOLDER=/opt/airflow/logs
+      - KAGGLE_USERNAME=muhammedhamed
+      - KAGGLE_KEY=5c7fdc17516bee367c2cc3aa53572fa6
+      - AIRFLOW__CORE__DEFAULT_TIMEZONE=Africa/Cairo
+      - TZ=Africa/Cairo      
+      - AIRFLOW__SMTP__SMTP_HOST=smtp.gmail.com
+      - AIRFLOW__SMTP__SMTP_STARTTLS=True
+      - AIRFLOW__SMTP__SMTP_SSL=False
+      - AIRFLOW__SMTP__SMTP_PORT=587
+      - AIRFLOW__SMTP__SMTP_MAIL_FROM=put your email here
+      - AIRFLOW__SMTP__SMTP_USER=put your email here
+      - AIRFLOW__SMTP__SMTP_PASSWORD=put your app password here
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./requirements.txt:/opt/airflow/requirements.txt
+      - ./data:/data
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    user: "50000:0"
+    command: >
+      bash -c "
+        if [ -f /opt/airflow/requirements.txt ]; then
+          pip install --user -r /opt/airflow/requirements.txt;
+        fi &&
+        exec airflow scheduler
+      "
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - airflow-network
+
+networks:
+  airflow-network:
+    driver: bridge
+
+volumes:
+  postgres-db-volume:
+  postgres_general_data:
