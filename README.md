@@ -117,7 +117,8 @@ airflow-transaction-pipeline/
 │   ├── email.jpg
 │   ├── Grantt.jpg
 │   └── Graph.jpg
-├── airflow.yaml           # Docker services configuration
-└── README.md
+├── README.md         
+└── airflow.yaml          # Docker services configuration
+└── requirements.txt
 ```
 
